@@ -14,7 +14,9 @@ app.use("/bye",(req,res)=>{
 app.use("/chai",(req,res)=>{
     res.send("chai bye chai");
 })
-
+app.use("/",(req,res)=>{
+    res.send("Himanshu Sengar");
+})
 app.listen(3000 , ()=>{
     console.log("server is successfuly listen on port 3000");
 });
