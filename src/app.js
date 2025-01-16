@@ -21,8 +21,17 @@ app.get("/a(bc)?d" ,(req,res)=>{ // now here bc is optional
     res.send({firstname: "Himanshu ",lastname:"Sengar"});
 });
 app.post("/user" ,(req,res)=>{
+    console.log(req.query);// this will give user request param
     res.send("Data saved successfully ");
 })
+app.get("/user/:userId" ,(req,res)=>{ // this will give user id from the url
+    console.log(req.params)
+    res.send({firstname: "Himanshu ",lastname:"Sengar"});
+});
+app.get("/user/:userId/:name/:password" ,(req,res)=>{ // this is dynamic param
+    console.log(req.params);
+    res.send({firstname: "Himanshu ",lastname:"Sengar"});
+});
 app.delete("/user" ,(req,res)=>{
     res.send("Data delete successfully ");
 })
