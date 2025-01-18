@@ -20,10 +20,41 @@ app.post("/signup", async(req,res)=>{
     
 })
 
-app.get("/user",(req,res)=>{
-    res.send("user is here")
-})
+// Get user by emailId
+app.get("/userEmail",async(req,res)=>{
+    
 
+    try{
+        const users = await User.find({emailId: req.body.emailId})
+        if(users.length===0){
+            res.status(404).send("User not found");
+        }
+        else{
+            res.send(users);
+        }
+    }
+    catch(err){
+        res.status(400).send("Something went wrong:-" + err.message);
+    }
+    
+    
+})
+//Feed API- Get/feed - get all the users from the database
+app.get("/feed", async(req,res)=>{
+    
+
+    try{
+        const users = await User.find({});
+        if(users.length ===0){
+            res.status(404).send("Users not fount");
+        }else{
+            res.send(users);
+        }
+    }
+    catch(err){
+        res.status(400).send("Something went wrong...")
+    }
+})
 
 connectDB()
     .then(()=>{
