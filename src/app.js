@@ -52,8 +52,33 @@ app.get("/feed", async(req,res)=>{
         }
     }
     catch(err){
-        res.status(400).send("Something went wrong...")
+        res.status(400).send("Something went wrong:-" + err.message);
     }
+})
+// Delete user by userId
+app.delete("/delete",async(req,res)=>{
+    try{
+        const user = await User.findByIdAndDelete({_id:req.body.userId});
+        res.send("user deleted successfully");
+    }
+    catch(err){
+        res.status(400).send("Something went wrong:-" + err.message);
+    }
+})
+//Update user
+app.patch("/patch", async(req,res)=>{
+    try{
+        const data= req.body;
+        const userId =req.body.userId;
+        const user = await User.findByIdAndUpdate({_id : userId},data);
+        //both way works
+        // const user = await User.findByIdAndUpdate({_id : req.body.userId},req.body);
+        res.send("user updated successfully");
+    }
+    catch(err){
+        res.status(400).send("Something went wrong:-" + err.message);
+    }
+
 })
 
 connectDB()
