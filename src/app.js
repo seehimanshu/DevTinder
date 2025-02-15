@@ -3,27 +3,22 @@ const {connectDB} = require("./config/database");
 const app=express();
 const {User} = require("./models/user");
 
+const cookieParser = require("cookie-parser");
+const jwt =require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
+
 app.use(express.json());
+app.use(cookieParser()); // to read json obj
 
-app.post("/signup", async(req,res)=>{
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/auth");
+const requestRouter = require("./routes/auth");
 
-    //Creating a new instance of the user model-----> in short creating a new user
-    const user = new User(req.body);
-    
-    try{
-        await user.save();
-        if(req.body?.skills.length>10){
-            throw new Error("Skills cannot be more than 10")
-        }else{
-            res.send("User Added Successfully...")
-        }
-        
-    }
-    catch(err){
-        res.status(400).send("Error saving the user:" + err.message);
-    }
-    
-})
+app.use("/" , authRouter);
+app.use("/" , profileRouter);
+app.use("/" , requestRouter);
+
+
 
 // Get user by emailId
 app.get("/userEmail",async(req,res)=>{
@@ -49,7 +44,7 @@ app.get("/feed", async(req,res)=>{
     
 
     try{
-        const users = await User.find({});
+        const users = await User.find({emailId: req.body.emailId});
         if(users.length ===0){
             res.status(404).send("Users not fount");
         }else{
@@ -77,7 +72,6 @@ app.patch("/user/:userId", async(req,res)=>{
     try{
         
         const ALLOWED_UPDATES=["photoUrl" , "about" , "gender" , "age", "skills"];
-
         const isUpdateAllowed = Object.keys(data).every((k)=>
             ALLOWED_UPDATES.includes(k)
         )
