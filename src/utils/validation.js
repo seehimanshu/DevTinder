@@ -13,7 +13,12 @@ const validateSignUpData = (req) =>{
         throw new Error("Please enter a strong password")
     }
 }
-
+const validateProfileUpdateData = (req) =>{
+    const PROFILE_UPDATES =["age","gender","photoUrl","about","skills"];
+    const isPROFILE_UPDATES_ALLOWED = Object.keys(req.body).every((feild)=> PROFILE_UPDATES.includes(feild));
+    return isPROFILE_UPDATES_ALLOWED;
+}
 module.exports = {
     validateSignUpData,
+    validateProfileUpdateData
 }

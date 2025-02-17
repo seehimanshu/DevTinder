@@ -9,7 +9,7 @@ const userAuth = async (req , res ,next )=>{
         const decodeObj = await jwt.verify(token,"$DevTinder@2812");
         const{_id} =decodeObj;
         
-        const user = await User.find({_id});
+        const user = await User.findById({_id});
         if(!user){
             throw new Error("user is not valid");
         }

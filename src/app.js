@@ -11,8 +11,8 @@ app.use(express.json());
 app.use(cookieParser()); // to read json obj
 
 const authRouter = require("./routes/auth");
-const profileRouter = require("./routes/auth");
-const requestRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
 app.use("/" , authRouter);
 app.use("/" , profileRouter);
@@ -40,15 +40,15 @@ app.get("/userEmail",async(req,res)=>{
     
 })
 //Feed API- Get/feed - get all the users from the database
-app.get("/feed", async(req,res)=>{
-    
-
+app.get("/feed",userAuth, async(req,res)=>{
     try{
+        
         const users = await User.find({emailId: req.body.emailId});
         if(users.length ===0){
             res.status(404).send("Users not fount");
         }else{
             res.send(users);
+            
         }
     }
     catch(err){

@@ -3,9 +3,10 @@ const authRouter = express.Router();
 const {validateSignUpData}= require("../utils/validation");
 const bcrypt = require("bcrypt");
 const {User} = require("../models/user");
+const { userAuth } = require("../middlewares/auth");
 
 
-authRouter.post("/signup", async(req,res)=>{
+authRouter.post("/signup",  async(req,res)=>{
     validateSignUpData(req);
     //Creating a new instance of the user model-----> in short creating a new user
     const{firstName , lastName , emailId , password}= req.body;
@@ -33,7 +34,7 @@ authRouter.post("/signup", async(req,res)=>{
     }
     
 })
-authRouter.post("/login",async(req,res)=>{
+authRouter.post("/login", async(req,res)=>{
     try{
         const{emailId ,password} = req.body;
         const user = await User.findOne({emailId:emailId});
@@ -56,5 +57,11 @@ authRouter.post("/login",async(req,res)=>{
         res.status(404).send("Error: " + err.message);
     }
 })
+authRouter.post("/logout", async(req,res)=>{
+
+    res.cookie("token", null ,{ expires: new Date(Date.now())});
+    res.send("Logout successfully!!!");
+})
+
 
 module.exports = authRouter;
