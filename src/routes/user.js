@@ -27,21 +27,69 @@ userRouter.get("/user/requests/received", userAuth , async(req,res)=>{
 
 })
 
-userRouter.get("/user/connections", userAuth, async(req,res)=>{
-    const loggedInUser = req.user;
+userRouter.get("/user/connections", userAuth , async(req,res)=>{
+    try{
+        const loggedInUser = req.user;
 
-    const connectionRequests = await ConnectionRequest.find({
-        $or:[
-            {fromUserId:loggedInUser._id, status:"accepted"},
-            {toUserId:loggedInUser._id, status:"accepted"}
-        ]
-    }).populate("fromUserId",USER_SAVE_DATA).populate("toUserId",USER_SAVE_DATA)
+        const connectionRequests = await ConnectionRequest.find({
+            $or:[
+                {fromUserId:loggedInUser._id, status:"accepted"},
+                {toUserId:loggedInUser._id, status:"accepted"}
+            ]
+        })
+        .populate("toUserId",USER_SAVE_DATA)
+        .populate("fromUserId",USER_SAVE_DATA);
 
-    const data = connectionRequests.map((row)=>{
-        if(row.fromUserId.toString() === loggedInUser._id.toString() ){
-            return row.toUserId;
-        }
-        return row.fromUserId;
-    })
+        const data = connectionRequests.map((row)=>{
+            if(row.fromUserId.toString() === loggedInUser._id.toString() ){
+                return row.toUserId;
+            }else{
+                return row.fromUserId;
+            }
+            
+        })
+        res.json({
+            
+            data
+        })
+    }
+    catch(err){
+        res.status(400).send("Error : " + err.message);
+    }
+})
+
+userRouter.get("/user/feed", userAuth , async(req,res)=>{
+    try{
+        const loggedInUser = req.user;
+
+        const connectionRequests = await ConnectionRequest.find({
+            $or:[
+                {fromUserId:loggedInUser},
+                {toUserId:loggedInUser}
+            ]
+        }).select("fromUserId toUserId");
+
+        const restrictedUsersFromFeed = new Set();
+
+        connectionRequests.forEach((req)=>{
+            restrictedUsersFromFeed.add(req.fromUserId.toString());
+            restrictedUsersFromFeed.add(req.toUserId.toString());
+        })
+
+        const users = await User.find({
+            $and:[
+                {_id: { $nin: Array.from(restrictedUsersFromFeed) } },
+                {_id: { $ne: loggedInUser._id } }
+            ]
+        }).select(USER_SAVE_DATA)
+
+        res.json({
+            message:"All user feed",
+            data:users
+        })
+    }
+    catch(err){
+        res.status(400).send("Error : " + err.message);
+    }
 })
 module.exports = userRouter;
